@@ -1,0 +1,20 @@
+models:
+  - tag: qwen2.5vl:3b
+    provider: ollama
+  - tag: gemma3:4b
+    provider: ollama
+profiles:
+  primary:
+    temperature: 0.0
+    seeds: [42]
+    repetitions: 1
+    num_ctx: 4096
+    num_predict: 2048
+    timeout_seconds: 300
+  stability:
+    temperature: 0.2
+    seeds: [1103, 2207, 3301]
+    repetitions: 3
+    num_ctx: 4096
+    num_predict: 2048
+    timeout_seconds: 300

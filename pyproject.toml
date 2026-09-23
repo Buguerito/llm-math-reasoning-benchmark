@@ -35,7 +35,7 @@ packages = ["src/math_benchmark"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-markers = ["integration: requires a running Ollama service"]
+markers = ["integration: opt-in tests that require a live local service"]
 
 [tool.ruff]
 line-length = 100
@@ -45,4 +45,3 @@ target-version = "py311"
 python_version = "3.11"
 strict = true
 packages = ["math_benchmark"]
-

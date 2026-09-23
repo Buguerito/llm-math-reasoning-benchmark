@@ -1,0 +1,4 @@
+version: 1.0.0
+base_instruction: |-
+  Provide a concise solution that explains the key steps.
+  End your response with: Final answer: <answer>
