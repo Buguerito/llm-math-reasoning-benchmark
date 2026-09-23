@@ -1,0 +1,5 @@
+run_id,problem_id,model_name,category,difficulty,status,experiment_kind,final_answer_correct,fully_correct_solution,correctness_score,reasoning_quality_score,instruction_following_score,primary_error,reviewer_id,is_fixture
+run-a1,P-1,model-a,algebra,foundational,success,primary,true,true,4,4,2,correct,reviewer-1,true
+run-a2,P-2,model-a,calculus,advanced,success,primary,false,false,2,2,2,arithmetic_or_algebraic_error,reviewer-1,true
+run-b1,P-1,model-b,algebra,foundational,success,primary,true,false,3,3,1,instruction_following_failure,reviewer-1,true
+run-b2,P-2,model-b,calculus,advanced,success,primary,false,false,0,0,0,problem_misinterpretation,reviewer-1,true

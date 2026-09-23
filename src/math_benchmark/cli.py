@@ -4,9 +4,19 @@ from pathlib import Path
 from typing import Annotated, Any
 
 import httpx
+import pandas as pd  # type: ignore[import-untyped]
 import typer
 import yaml  # type: ignore[import-untyped]
 
+from math_benchmark.analysis.metrics import (
+    AnalysisError,
+    error_distribution,
+    metrics_by_category,
+    metrics_by_difficulty,
+    overall_metrics,
+)
+from math_benchmark.analysis.plots import create_all_plots
+from math_benchmark.analysis.report import ReportError, render_report
 from math_benchmark.dataset import DatasetValidationError, load_problems, validate_benchmark
 from math_benchmark.enums import ExperimentKind
 from math_benchmark.environment import collect_environment, system_command_runner
@@ -187,3 +197,35 @@ def evaluate_command(
         raise typer.Exit(code=1) from exc
     typer.echo(f"wrote {len(frame)} annotation rows to {output}")
     typer.echo(f"technical failures: {failure_path}")
+
+
+@app.command("analyze")
+def analyze_command(
+    evaluations: Annotated[Path, typer.Option(exists=True)],
+    output: Annotated[Path, typer.Option()],
+    fixture_report: Annotated[bool, typer.Option("--fixture-report")] = False,
+) -> None:
+    """Generate metric tables, five plots, and a Markdown report."""
+    try:
+        frame = pd.read_csv(evaluations)
+        tables = {
+            "overall": overall_metrics(frame),
+            "category": metrics_by_category(frame),
+            "difficulty": metrics_by_difficulty(frame),
+            "errors": error_distribution(frame),
+        }
+        output.mkdir(parents=True, exist_ok=True)
+        for name, table in tables.items():
+            table.to_csv(output / f"{name}_metrics.csv", index=False, lineterminator="\n")
+        plot_paths = create_all_plots(frame, tables, output)
+        report_path = render_report(
+            frame,
+            tables,
+            plot_paths,
+            output / "report.md",
+            fixture_report=fixture_report,
+        )
+    except (AnalysisError, ReportError, OSError, ValueError) as exc:
+        typer.echo(str(exc), err=True)
+        raise typer.Exit(code=1) from exc
+    typer.echo(f"wrote {len(plot_paths)} plots and report {report_path}")
