@@ -7,6 +7,7 @@ __pycache__/
 .coverage
 htmlcov/
 .env
+.ipynb_checkpoints/
 work/
 results/raw/*.jsonl
 results/raw/*.json
@@ -15,4 +16,3 @@ results/reports/*.csv
 results/reports/*.png
 results/reports/*.md
 !.gitkeep
-
