@@ -24,9 +24,7 @@ jobs:
         run: python -m mypy --python-version ${{ matrix.python-version }} src
       - name: Offline tests
         run: python -m pytest -m "not integration"
-      - name: Rebuild generated artifacts
-        run: |
-          python scripts/generate_figures.py
-          python scripts/build_dataset.py
-      - name: Verify generated artifacts are unchanged
-        run: git diff --exit-code data/problems.jsonl data/figures
+      - name: Rebuild portable generated artifact
+        run: python scripts/build_dataset.py
+      - name: Verify canonical dataset is unchanged
+        run: git diff --exit-code data/problems.jsonl

@@ -24,7 +24,7 @@ Committed example data are **synthetic test data, not experimental results**. Re
 | Graph interpretation | 3 |
 | Word problems | 3 |
 
-Difficulty totals are 5 foundational, 9 intermediate, and 6 advanced items. Three graph problems include reproducible PNG assets generated from committed CSV data.
+Difficulty totals are 5 foundational, 9 intermediate, and 6 advanced items. Three graph problems include frozen PNG assets generated from committed CSV data.
 
 ## Architecture
 
@@ -56,13 +56,14 @@ On macOS or Linux, activate with `source .venv/bin/activate`. No model is traine
 
 ## Dataset Validation
 
-Regenerate assets and validate the frozen distribution:
+Rebuild the portable JSONL artifact and validate the frozen distribution:
 
 ```powershell
-python scripts/generate_figures.py
 python scripts/build_dataset.py
 python -m math_benchmark validate
 ```
+
+The committed PNGs are the canonical image inputs. `python scripts/generate_figures.py` is an authoring command for a new benchmark version, not a prerequisite for inference: Matplotlib raster bytes can vary across operating systems even when the chart content is unchanged.
 
 ## Target-PC Inference
 

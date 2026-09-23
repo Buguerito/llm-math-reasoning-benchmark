@@ -35,7 +35,7 @@ A delayed, blinded, model-by-difficulty stratified 20% recheck reports exact and
 
 ## Reproducibility controls
 
-Raw attempts are append-only JSONL with UUID run IDs and parent IDs for retries. Prompts and image bytes are SHA-256 hashed. Manifests record benchmark/prompt versions, model tags/digests, generation parameters, environment, package versions, OS, CPU, RAM, GPU when available, and Ollama version. Dataset and figure builders are deterministic and checked in CI.
+Raw attempts are append-only JSONL with UUID run IDs and parent IDs for retries. Prompts and image bytes are SHA-256 hashed. Manifests record benchmark/prompt versions, model tags/digests, generation parameters, environment, package versions, OS, CPU, RAM, GPU when available, and Ollama version. CI rebuilds the canonical JSONL byte for byte, verifies frozen figure hashes, and checks that figure generation is deterministic within one software environment. The committed PNGs remain the canonical inputs because Matplotlib raster encoding can vary across operating systems.
 
 ## Limitations
 

@@ -58,4 +58,6 @@ def test_ci_is_network_free_during_tests() -> None:
     workflow = (ROOT / ".github" / "workflows" / "ci.yml").read_text(encoding="utf-8")
     assert 'pytest -m "not integration"' in workflow
     assert "ollama pull" not in workflow.lower()
-    assert "git diff --exit-code data/problems.jsonl data/figures" in workflow
+    assert "python scripts/build_dataset.py" in workflow
+    assert "python scripts/generate_figures.py" not in workflow
+    assert "git diff --exit-code data/problems.jsonl" in workflow

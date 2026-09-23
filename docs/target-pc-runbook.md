@@ -60,13 +60,12 @@ Confirm that each command returns a coherent response. These checks are pilots a
 ## 6. Verify data and capture the plan
 
 ```powershell
-python scripts/generate_figures.py
 python scripts/build_dataset.py
 python -m math_benchmark validate
 python -m math_benchmark run --dry-run --models qwen2.5vl:3b --models gemma3:4b
 ```
 
-The dry run must report 40 planned attempts. The real run automatically captures Python/packages, OS, CPU, total RAM, GPU when available, Ollama version, prompt/benchmark versions, model tags/digests, and input hashes.
+Use the committed PNGs as the frozen image inputs; do not regenerate them before inference. Matplotlib raster bytes may differ across operating systems. The dry run must report 40 planned attempts. The real run automatically captures Python/packages, OS, CPU, total RAM, GPU when available, Ollama version, prompt/benchmark versions, model tags/digests, and input hashes.
 
 ## 7. Execute the 40-response primary run
 
@@ -112,7 +111,8 @@ Do not use `--fixture-report` for experimental data.
 python -m pytest -m "not integration"
 python -m ruff check src tests scripts
 python -m mypy src
-git diff --exit-code data/problems.jsonl data/figures
+git diff --exit-code data/problems.jsonl
+git status --short data/figures
 ```
 
-Archive the manifest, raw JSONL, completed annotations, agreement export, metric CSVs, plots, report, and Git commit SHA together.
+The final command must print nothing; any figure change means the frozen benchmark inputs were modified. Archive the manifest, raw JSONL, completed annotations, agreement export, metric CSVs, plots, report, and Git commit SHA together.
