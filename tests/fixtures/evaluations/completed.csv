@@ -1,0 +1,3 @@
+evaluation_id,run_id,final_answer_correct,automated_result,human_override,original_automated_result,override_reason,correctness_score,reasoning_quality_score,instruction_following_score,primary_error,secondary_error,first_error_step,evaluator_confidence,review_notes,reviewer_id,annotation_timestamp,blinded_pass
+eval-fixture-success-1,fixture-success-1,true,true,false,true,,4,4,2,correct,,,3,Matches the reference solution.,reviewer-1,2026-09-23T19:00:00Z,false
+eval-fixture-success-2,fixture-success-2,false,false,false,false,,2,2,2,arithmetic_or_algebraic_error,,States the second-order coefficient is 3.,3,The expansion coefficient should be 2.,reviewer-1,2026-09-23T19:01:00Z,false

@@ -118,3 +118,48 @@ class HumanEvaluation(StrictModel):
     reviewer_id: str | None = None
     annotation_timestamp: datetime | None = None
     blinded_pass: bool = False
+
+    @model_validator(mode="after")
+    def enforce_auditable_annotation(self) -> "HumanEvaluation":
+        if self.human_override:
+            if not self.override_reason or not self.override_reason.strip():
+                raise ValueError("human override requires a nonblank override_reason")
+            if self.original_automated_result is None:
+                raise ValueError("human override requires original_automated_result")
+            if not self.reviewer_id or not self.reviewer_id.strip():
+                raise ValueError("human override requires reviewer_id")
+            if self.annotation_timestamp is None:
+                raise ValueError("human override requires annotation_timestamp")
+
+        if self.primary_error == ErrorCategory.CORRECT:
+            if self.final_answer_correct is not True:
+                raise ValueError("primary_error=correct requires final_answer_correct=true")
+            if self.secondary_error is not None:
+                raise ValueError("primary_error=correct cannot have secondary_error")
+        elif self.primary_error is not None:
+            if not self.first_error_step or not self.first_error_step.strip():
+                raise ValueError("a non-correct primary error requires first_error_step")
+        if self.secondary_error == ErrorCategory.CORRECT:
+            raise ValueError("secondary_error cannot be correct")
+
+        rubric_values = (
+            self.correctness_score,
+            self.reasoning_quality_score,
+            self.instruction_following_score,
+            self.primary_error,
+            self.evaluator_confidence,
+        )
+        if any(value is not None for value in rubric_values):
+            if any(value is None for value in rubric_values):
+                raise ValueError("completed evaluation requires all rubric fields")
+            if self.final_answer_correct is None:
+                raise ValueError("completed evaluation requires final_answer_correct")
+            if not self.reviewer_id or not self.reviewer_id.strip():
+                raise ValueError("completed evaluation requires a nonblank reviewer_id")
+            if self.annotation_timestamp is None:
+                raise ValueError("completed evaluation requires annotation_timestamp")
+            if self.evaluator_confidence == 1 and (
+                not self.review_notes or not self.review_notes.strip()
+            ):
+                raise ValueError("low-confidence evaluation requires review_notes")
+        return self

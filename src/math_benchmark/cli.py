@@ -10,6 +10,7 @@ import yaml  # type: ignore[import-untyped]
 from math_benchmark.dataset import DatasetValidationError, load_problems, validate_benchmark
 from math_benchmark.enums import ExperimentKind
 from math_benchmark.environment import collect_environment, system_command_runner
+from math_benchmark.evaluation import create_annotation_sheet, select_blinded_recheck
 from math_benchmark.providers.base import ModelConfig, ModelIdentity, PromptConfig, ProviderError
 from math_benchmark.providers.ollama import OllamaProvider
 from math_benchmark.runner import (
@@ -158,3 +159,31 @@ def run_command(
     run_manifest = manifest_for_run(plan, identities, all_attempts, environment)
     write_manifest_atomic(manifest_path, run_manifest)
     typer.echo(f"wrote {len(attempts)} attempts to {output_path}")
+
+
+@app.command("evaluate")
+def evaluate_command(
+    dataset: Annotated[Path, typer.Option(exists=True)] = Path("data/problems.jsonl"),
+    attempts: Annotated[Path, typer.Option(exists=True)] = Path("results/raw/attempts.jsonl"),
+    output: Annotated[Path, typer.Option()] = Path("results/evaluations/annotation_sheet.csv"),
+    technical_failures: Annotated[Path | None, typer.Option()] = None,
+    create_recheck: Annotated[bool, typer.Option("--create-recheck")] = False,
+    recheck_fraction: Annotated[float, typer.Option()] = 0.20,
+    recheck_seed: Annotated[int, typer.Option()] = 20260923,
+) -> None:
+    """Create an auditable annotation sheet from immutable raw attempts."""
+    try:
+        problems = load_problems(dataset)
+        attempt_records = JsonlAttemptStore(attempts).load_all()
+        failure_path = technical_failures or output.with_name(
+            f"{output.stem}.technical_failures.csv"
+        )
+        frame = create_annotation_sheet(attempt_records, problems, output, failure_path)
+        if create_recheck:
+            blinded = select_blinded_recheck(frame, recheck_fraction, recheck_seed)
+            blinded.to_csv(output.parent / "blinded_recheck.csv", index=False, lineterminator="\n")
+    except (DatasetValidationError, OSError, ValueError) as exc:
+        typer.echo(str(exc), err=True)
+        raise typer.Exit(code=1) from exc
+    typer.echo(f"wrote {len(frame)} annotation rows to {output}")
+    typer.echo(f"technical failures: {failure_path}")
