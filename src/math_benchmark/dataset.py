@@ -1,6 +1,6 @@
 from collections import Counter
 from collections.abc import Sequence
-from pathlib import Path
+from pathlib import Path, PureWindowsPath
 
 from pydantic import ValidationError
 
@@ -47,7 +47,7 @@ def load_problems(path: Path) -> list[Problem]:
 def _validated_asset_path(data_root: Path, relative_path: str, problem_id: str) -> Path:
     candidate = Path(relative_path)
     root = data_root.resolve()
-    if candidate.is_absolute():
+    if candidate.is_absolute() or PureWindowsPath(relative_path).is_absolute():
         raise DatasetValidationError(
             f"{problem_id}: asset path {relative_path!r} must remain inside data root"
         )
@@ -92,4 +92,3 @@ def validate_benchmark(
             "difficulty distribution mismatch: "
             f"expected {EXPECTED_DIFFICULTY_COUNTS}, got {dict(difficulty_counts)}"
         )
-

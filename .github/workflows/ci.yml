@@ -21,7 +21,7 @@ jobs:
       - name: Lint
         run: python -m ruff check src tests scripts
       - name: Type check
-        run: python -m mypy src
+        run: python -m mypy --python-version ${{ matrix.python-version }} src
       - name: Offline tests
         run: python -m pytest -m "not integration"
       - name: Rebuild generated artifacts
